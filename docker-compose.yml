@@ -1,0 +1,45 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pay-app
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.4
+    container_name: pay-app-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: pay_app
+      MYSQL_USER: root
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    container_name: pay-app-phpMyAdmin
+    ports:
+      - 8001:80
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
+    # networks:
+    #   - football-network
+  
+
+volumes:
+  mysql_data:
